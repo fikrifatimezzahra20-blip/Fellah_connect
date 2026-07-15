@@ -19,7 +19,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    userId: {
+    farmerId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
@@ -28,7 +28,7 @@ module.exports = (sequelize) => {
   });
 
   Parcelle.associate = (models) => {
-    Parcelle.belongsTo(models.User, { foreignKey: 'userId' });
+    Parcelle.belongsTo(models.Farmer, { foreignKey: 'farmerId' });
   };
 
   return Parcelle;

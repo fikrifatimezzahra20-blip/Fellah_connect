@@ -32,7 +32,7 @@ module.exports = (sequelize) => {
   });
 
   User.associate = (models) => {
-    User.hasMany(models.Parcelle, { foreignKey: 'userId' });
+    User.hasOne(models.Farmer, { foreignKey: 'userId' });
   };
 
   return User;
