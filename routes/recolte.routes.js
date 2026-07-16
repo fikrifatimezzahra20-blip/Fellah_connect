@@ -1,17 +1,12 @@
-'use strict';
-
 const express = require('express');
 const router = express.Router();
-
 const { create, findAll, findOne, update, destroy } = require('../controllers/recolte.controller');
 const { verifyToken } = require('../middlewares/auth.middleware');
-
+const validateRecolte = require('../middlewares/validateRecolte');
 router.use(verifyToken);
-
-router.post('/', create);
+router.post('/', validateRecolte, create); 
 router.get('/', findAll);
 router.get('/:id', findOne);
-router.put('/:id', update);
+router.put('/:id', validateRecolte, update);
 router.delete('/:id', destroy);
-
-module.exports = router;
+module.exports = migrate; 
