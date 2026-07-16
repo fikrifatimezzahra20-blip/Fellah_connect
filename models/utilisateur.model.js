@@ -5,6 +5,14 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Utilisateur extends Model {
     static associate(models) {
+      Utilisateur.hasMany(models.Parcelle, {
+        foreignKey: 'utilisateurId',
+        as: 'parcelles',
+      });
+      Utilisateur.hasMany(models.Recolte, {
+        foreignKey: 'utilisateurId',
+        as: 'recoltes',
+      });
     }
 
     toSafeJSON() {
