@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const Recolte = sequelize.define('Recolte', {
+  const SaleOffer = sequelize.define('SaleOffer', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -11,19 +11,19 @@ module.exports = (sequelize) => {
       type: DataTypes.FLOAT,
       allowNull: false
     },
-    harvestDate: {
-      type: DataTypes.DATE,
+    askingPrice: {
+      type: DataTypes.DECIMAL,
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('READY', 'SOLD'),
+      type: DataTypes.ENUM('OPEN', 'ACCEPTED', 'CLOSED'),
       allowNull: false
     },
-    parcelId: {
+    harvestId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    productId: {
+    marketId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
@@ -31,11 +31,10 @@ module.exports = (sequelize) => {
     timestamps: true
   });
 
-  Recolte.associate = (models) => {
-    Recolte.belongsTo(models.Parcelle, { foreignKey: 'parcelId' });
-    Recolte.belongsTo(models.Product, { foreignKey: 'productId' });
-    Recolte.hasMany(models.SaleOffer, { foreignKey: 'harvestId' });
+  SaleOffer.associate = (models) => {
+    SaleOffer.belongsTo(models.Recolte, { foreignKey: 'harvestId' });
+    SaleOffer.belongsTo(models.Market, { foreignKey: 'marketId' });
   };
 
-  return Recolte;
+  return SaleOffer;
 };
