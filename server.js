@@ -8,6 +8,11 @@ const morgan = require('morgan');
 const authRoutes = require('./routes/auth.routes');
 const agentRoutes = require('./routes/agent.routes');
 const recolteRoutes = require('./routes/recolte.routes');
+const parcelleRoutes = require('./routes/parcelle.routes');
+const produitRoutes = require('./routes/produit.routes');
+const marcheRoutes = require('./routes/marche.routes');
+const prixMarcheRoutes = require('./routes/prix-marche.routes');
+const offreVenteRoutes = require('./routes/offre-vente.routes');
 const { notFoundHandler, errorHandler } = require('./middlewares/error.middleware');
 
 const app = express();
@@ -19,6 +24,11 @@ app.use(morgan('dev'));
 app.use('/api/auth', authRoutes);
 app.use('/api/agent', agentRoutes);
 app.use('/api/recoltes', recolteRoutes);
+app.use('/api/parcelles', parcelleRoutes);
+app.use('/api/produits', produitRoutes);
+app.use('/api/marches', marcheRoutes);
+app.use('/api/prix-marches', prixMarcheRoutes);
+app.use('/api/offres-vente', offreVenteRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'fellahconnect-api' });
