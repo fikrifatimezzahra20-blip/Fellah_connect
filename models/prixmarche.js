@@ -24,7 +24,8 @@ module.exports = (sequelize) => {
       allowNull: false
     }
   }, {
-    timestamps: true
+    timestamps: true,
+    tableName: 'PrixMarche'
   });
 
   MarketPrice.associate = (models) => {

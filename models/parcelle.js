@@ -19,16 +19,17 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    farmerId: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
   }, {
-    timestamps: true
+    timestamps: true,
+    tableName: 'Parcelles'
   });
 
   Parcelle.associate = (models) => {
-    Parcelle.belongsTo(models.Farmer, { foreignKey: 'farmerId' });
+    Parcelle.belongsTo(models.User, { foreignKey: 'userId' });
   };
 
   return Parcelle;

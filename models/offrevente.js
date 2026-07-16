@@ -28,7 +28,8 @@ module.exports = (sequelize) => {
       allowNull: false
     }
   }, {
-    timestamps: true
+    timestamps: true,
+    tableName: 'OffresVente'
   });
 
   SaleOffer.associate = (models) => {

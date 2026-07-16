@@ -28,7 +28,8 @@ module.exports = (sequelize) => {
       allowNull: false
     }
   }, {
-    timestamps: true
+    timestamps: true,
+    tableName: 'Recoltes'
   });
 
   Recolte.associate = (models) => {

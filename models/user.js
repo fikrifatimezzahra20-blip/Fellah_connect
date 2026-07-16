@@ -24,15 +24,16 @@ module.exports = (sequelize) => {
       allowNull: false
     },
     role: {
-      type: DataTypes.ENUM('ADMIN', 'FARMER'),
+      type: DataTypes.ENUM('ADMIN', 'FARMER', 'RELEVEUR'),
       allowNull: false
     }
   }, {
-    timestamps: true
+    timestamps: true,
+    tableName: 'Users'
   });
 
   User.associate = (models) => {
-    User.hasOne(models.Farmer, { foreignKey: 'userId' });
+    User.hasMany(models.Parcelle, { foreignKey: 'userId' });
   };
 
   return User;
