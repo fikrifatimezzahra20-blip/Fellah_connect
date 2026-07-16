@@ -13,6 +13,7 @@ const produitRoutes = require('./routes/produit.routes');
 const marcheRoutes = require('./routes/marche.routes');
 const prixMarcheRoutes = require('./routes/prix-marche.routes');
 const offreVenteRoutes = require('./routes/offre-vente.routes');
+const userRoutes = require('./routes/user.routes');
 const { notFoundHandler, errorHandler } = require('./middlewares/error.middleware');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/produits', produitRoutes);
 app.use('/api/marches', marcheRoutes);
 app.use('/api/prix-marches', prixMarcheRoutes);
 app.use('/api/offres-vente', offreVenteRoutes);
+app.use('/api/agriculteurs', userRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'fellahconnect-api' });
