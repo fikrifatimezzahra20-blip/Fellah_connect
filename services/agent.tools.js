@@ -1,6 +1,6 @@
 'use strict';
 
-const { Recolte, Parcelle, PrixMarche, OffreVente, Marche } = require('../models');
+const { Recolte, Parcelle, PrixMarche, OffreVente, Marche, Produit } = require('../models');
 const { Op } = require('sequelize');
 
 // ──────────────────────────────────────────────────────────────
@@ -11,16 +11,14 @@ const TOOL_DEFINITIONS = [
   {
     type: 'function',
     function: {
-      name: 'obtenir_mes_recoltes',
-      description:
-        "Retourne la liste des recoltes de l'utilisateur connecte, avec statut optionnel.",
+      name: 'consulter_recoltes',
+      description: "Consulter la liste des recoltes de l'utilisateur.",
       parameters: {
         type: 'object',
         properties: {
-          statut: {
-            type: 'string',
-            enum: ['en_attente', 'disponible', 'vendue'],
-            description: 'Filtrer par statut (optionnel).',
+          user_id: {
+            type: 'integer',
+            description: "ID de l'utilisateur (optionnel, par defaut l'utilisateur connecte).",
           },
         },
         required: [],
@@ -30,117 +28,104 @@ const TOOL_DEFINITIONS = [
   {
     type: 'function',
     function: {
-      name: 'creer_recolte',
-      description:
-        "Enregistre une nouvelle recolte pour l'utilisateur connecte. Demander confirmation avant.",
+      name: 'consulter_parcelles',
+      description: "Consulter la liste des parcelles de l'utilisateur.",
       parameters: {
         type: 'object',
         properties: {
-          produit: {
-            type: 'string',
-            description: 'Nom du produit (ex: tomate, pomme de terre).',
-          },
-          quantiteKg: {
-            type: 'number',
-            description: 'Quantite en kilogrammes.',
-          },
-          parcelleId: {
+          user_id: {
             type: 'integer',
-            description: "ID de la parcelle (optionnel).",
-          },
-          confirmation: {
-            type: 'boolean',
-            description: "true si l'utilisateur a confirme l'action.",
+            description: "ID de l'utilisateur (optionnel, par defaut l'utilisateur connecte).",
           },
         },
-        required: ['produit', 'quantiteKg', 'confirmation'],
+        required: [],
       },
     },
   },
   {
     type: 'function',
     function: {
-      name: 'obtenir_meilleur_prix',
-      description:
-        'Trouve le marche avec le meilleur prix pour un produit donne.',
+      name: 'rechercher_prix_marches',
+      description: 'Rechercher les prix des marches pour un produit.',
       parameters: {
         type: 'object',
         properties: {
+          produit_id: {
+            type: 'integer',
+            description: "ID du produit a rechercher (optionnel si le nom du produit est specifie).",
+          },
           produit: {
             type: 'string',
-            description: 'Nom du produit a chercher.',
+            description: "Nom du produit a rechercher (optionnel si l'ID est specifie).",
           },
         },
-        required: ['produit'],
+        required: [],
       },
     },
   },
   {
     type: 'function',
     function: {
-      name: 'publier_offre_vente',
-      description:
-        "Publie une offre de vente pour une recolte sur un marche. Demander confirmation avant.",
+      name: 'enregistrer_recolte',
+      description: "Enregistre une nouvelle recolte. Demander la confirmation de l'utilisateur avant d'executer avec confirmation=true.",
       parameters: {
         type: 'object',
         properties: {
-          recolteId: {
+          parcelle_id: {
             type: 'integer',
-            description: 'ID de la recolte a vendre.',
+            description: "ID de la parcelle.",
           },
-          marcheId: {
+          produit_id: {
             type: 'integer',
-            description: 'ID du marche cible.',
+            description: "ID du produit.",
           },
           quantite: {
             type: 'number',
-            description: 'Quantite a vendre en kg.',
+            description: "Quantite recoltee (en kg).",
           },
-          prixDemande: {
-            type: 'number',
-            description: 'Prix demande en DH/kg.',
+          date_recolte: {
+            type: 'string',
+            description: "Date de la recolte (format YYYY-MM-DD, optionnel, aujourd'hui par defaut).",
           },
           confirmation: {
             type: 'boolean',
-            description: "true si l'utilisateur a confirme l'action.",
+            description: "true si l'utilisateur a explicitement confirme l'enregistrement de cette recolte.",
           },
         },
-        required: ['recolteId', 'marcheId', 'quantite', 'prixDemande', 'confirmation'],
+        required: ['parcelle_id', 'produit_id', 'quantite', 'confirmation'],
       },
     },
   },
   {
     type: 'function',
     function: {
-      name: 'obtenir_mes_parcelles',
-      description:
-        "Retourne la liste des parcelles de l'utilisateur connecte.",
-      parameters: {
-        type: 'object',
-        properties: {},
-        required: [],
-      },
-    },
-  },
-  {
-    type: 'function',
-    function: {
-      name: 'obtenir_prix_marche',
-      description:
-        'Consulte les prix du marche pour un produit, avec filtres optionnels.',
+      name: 'creer_offre_vente',
+      description: "Publie une offre de vente pour une recolte. Demander la confirmation de l'utilisateur avant d'executer avec confirmation=true.",
       parameters: {
         type: 'object',
         properties: {
-          produit: {
-            type: 'string',
-            description: 'Nom du produit.',
+          recolte_id: {
+            type: 'integer',
+            description: "ID de la recolte.",
           },
-          marche: {
-            type: 'string',
-            description: 'Nom du marche (optionnel).',
+          quantite: {
+            type: 'number',
+            description: "Quantite a vendre (en kg).",
+          },
+          prix_demande: {
+            type: 'number',
+            description: "Prix demande (en DH/kg).",
+          },
+          marche_id: {
+            type: 'integer',
+            description: "ID du marche (optionnel, sera determine automatiquement si non specifie).",
+          },
+          confirmation: {
+            type: 'boolean',
+            description: "true si l'utilisateur a explicitement confirme la creation de l'offre.",
           },
         },
-        required: ['produit'],
+        required: ['recolte_id', 'quantite', 'prix_demande', 'confirmation'],
       },
     },
   },
@@ -150,14 +135,23 @@ const TOOL_DEFINITIONS = [
 // Tool handlers — each returns a JSON-serializable result
 // ──────────────────────────────────────────────────────────────
 
-async function handle_obtenir_mes_recoltes(args, user) {
-  const where = { utilisateurId: user.id };
-  if (args.statut) {
-    where.statut = args.statut;
+async function handle_consulter_recoltes(args, user) {
+  const targetUserId = args.user_id || user.id;
+
+  // Security validation: non-admin users can only view their own harvests
+  if (user.role !== 'admin' && targetUserId !== user.id) {
+    return {
+      succes: false,
+      message: "Vous n'etes pas autorise a consulter les recoltes d'un autre utilisateur.",
+    };
   }
 
   const recoltes = await Recolte.findAll({
-    where,
+    where: { utilisateurId: targetUserId },
+    include: [
+      { model: Produit, as: 'produit', attributes: ['nom', 'categorie', 'unite'] },
+      { model: Parcelle, as: 'parcelle', attributes: ['nom', 'commune'] }
+    ],
     order: [['createdAt', 'DESC']],
     limit: 20,
   });
@@ -171,129 +165,29 @@ async function handle_obtenir_mes_recoltes(args, user) {
     total: recoltes.length,
     recoltes: recoltes.map((r) => ({
       id: r.id,
-      produit: r.produit,
+      produit: r.produit ? r.produit.nom : 'Inconnu',
       quantiteKg: r.quantiteKg,
       statut: r.statut,
       dateRecolte: r.dateRecolte,
       prixSouhaite: r.prixSouhaite,
+      parcelle: r.parcelle ? r.parcelle.nom : null,
     })),
   };
 }
 
-async function handle_creer_recolte(args, user) {
-  if (!args.confirmation) {
+async function handle_consulter_parcelles(args, user) {
+  const targetUserId = args.user_id || user.id;
+
+  // Security validation: non-admin users can only view their own parcelles
+  if (user.role !== 'admin' && targetUserId !== user.id) {
     return {
       succes: false,
-      message: "L'utilisateur n'a pas confirme. Demandez confirmation d'abord.",
+      message: "Vous n'etes pas autorise a consulter les parcelles d'un autre utilisateur.",
     };
   }
 
-  // If parcelleId is provided, verify ownership
-  if (args.parcelleId) {
-    const parcelle = await Parcelle.findByPk(args.parcelleId);
-    if (!parcelle || parcelle.utilisateurId !== user.id) {
-      return {
-        succes: false,
-        message: "Cette parcelle n'appartient pas a cet utilisateur.",
-      };
-    }
-  }
-
-  const recolte = await Recolte.create({
-    produit: args.produit,
-    quantiteKg: args.quantiteKg,
-    dateRecolte: new Date(),
-    statut: 'en_attente',
-    parcelleId: args.parcelleId || null,
-    utilisateurId: user.id,
-  });
-
-  return {
-    succes: true,
-    recolte: {
-      id: recolte.id,
-      produit: recolte.produit,
-      quantiteKg: recolte.quantiteKg,
-      statut: recolte.statut,
-    },
-  };
-}
-
-async function handle_obtenir_meilleur_prix(args) {
-  const meilleur = await PrixMarche.findOne({
-    where: {
-      produit: { [Op.iLike]: `%${args.produit}%` },
-    },
-    order: [['prix', 'DESC']],
-  });
-
-  if (!meilleur) {
-    return {
-      trouve: false,
-      message: `Aucun prix trouve pour "${args.produit}".`,
-    };
-  }
-
-  return {
-    trouve: true,
-    produit: meilleur.produit,
-    marche: meilleur.marche,
-    prix: meilleur.prix,
-    unite: meilleur.unite,
-    dateReleve: meilleur.dateReleve,
-  };
-}
-
-async function handle_publier_offre_vente(args, user) {
-  if (!args.confirmation) {
-    return {
-      succes: false,
-      message: "L'utilisateur n'a pas confirme. Demandez confirmation d'abord.",
-    };
-  }
-
-  const recolte = await Recolte.findByPk(args.recolteId);
-  if (!recolte) {
-    return { succes: false, message: 'Recolte non trouvee.' };
-  }
-  if (recolte.utilisateurId !== user.id) {
-    return {
-      succes: false,
-      message: "Cette recolte n'appartient pas a cet utilisateur.",
-    };
-  }
-
-  const marche = await Marche.findByPk(args.marcheId);
-  if (!marche) {
-    return { succes: false, message: 'Marche non trouve.' };
-  }
-
-  const offre = await OffreVente.create({
-    quantite: args.quantite,
-    prixDemande: args.prixDemande,
-    statut: 'ouverte',
-    recolteId: args.recolteId,
-    marcheId: args.marcheId,
-  });
-
-  if (recolte.statut === 'en_attente') {
-    await recolte.update({ statut: 'disponible' });
-  }
-
-  return {
-    succes: true,
-    offre: {
-      id: offre.id,
-      quantite: offre.quantite,
-      prixDemande: offre.prixDemande,
-      marche: marche.nom,
-    },
-  };
-}
-
-async function handle_obtenir_mes_parcelles(args, user) {
   const parcelles = await Parcelle.findAll({
-    where: { utilisateurId: user.id },
+    where: { utilisateurId: targetUserId },
     order: [['createdAt', 'DESC']],
   });
 
@@ -313,37 +207,188 @@ async function handle_obtenir_mes_parcelles(args, user) {
   };
 }
 
-async function handle_obtenir_prix_marche(args) {
-  const where = {
-    produit: { [Op.iLike]: `%${args.produit}%` },
-  };
-  if (args.marche) {
-    where.marche = { [Op.iLike]: `%${args.marche}%` };
+async function handle_rechercher_prix_marches(args) {
+  let productCondition = {};
+
+  if (args.produit_id) {
+    productCondition = { id: args.produit_id };
+  } else if (args.produit) {
+    productCondition = { nom: { [Op.iLike]: `%${args.produit}%` } };
+  } else {
+    return { trouve: false, message: "Vous devez specifier un nom ou un ID de produit." };
   }
 
-  const prix = await PrixMarche.findAll({
-    where,
+  // Find the product
+  const product = await Produit.findOne({ where: productCondition });
+  if (!product) {
+    return { trouve: false, message: `Aucun produit trouve pour ${args.produit_id ? 'l\'ID ' + args.produit_id : '"' + args.produit + '"'}.` };
+  }
+
+  // Query price records for this product
+  const prices = await PrixMarche.findAll({
+    where: { produitId: product.id },
+    include: [{ model: Marche, as: 'marcheRef', attributes: ['nom', 'ville'] }],
     order: [['dateReleve', 'DESC']],
     limit: 10,
   });
 
-  if (prix.length === 0) {
+  if (prices.length === 0) {
+    // Fallback to legacy string field query on PrixMarche if no matching produitId is linked yet
+    const legacyPrices = await PrixMarche.findAll({
+      where: { produit: { [Op.iLike]: `%${product.nom}%` } },
+      order: [['dateReleve', 'DESC']],
+      limit: 10,
+    });
+
+    if (legacyPrices.length === 0) {
+      return { trouve: false, message: `Aucun releve de prix trouve pour le produit "${product.nom}".` };
+    }
+
     return {
-      trouve: false,
-      message: `Aucun prix trouve pour "${args.produit}".`,
+      trouve: true,
+      total: legacyPrices.length,
+      produit: product.nom,
+      prix: legacyPrices.map((p) => ({
+        marche: p.marche,
+        prix: p.prix,
+        unite: p.unite,
+        dateReleve: p.dateReleve,
+      })),
     };
   }
 
   return {
     trouve: true,
-    total: prix.length,
-    prix: prix.map((p) => ({
-      produit: p.produit,
-      marche: p.marche,
+    total: prices.length,
+    produit: product.nom,
+    prix: prices.map((p) => ({
+      marche: p.marcheRef ? p.marcheRef.nom : p.marche,
+      ville: p.marcheRef ? p.marcheRef.ville : null,
       prix: p.prix,
       unite: p.unite,
       dateReleve: p.dateReleve,
     })),
+  };
+}
+
+async function handle_enregistrer_recolte(args, user) {
+  if (!args.confirmation) {
+    return {
+      succes: false,
+      confirmationRequise: true,
+      message: "Confirmation requise pour enregistrer cette recolte.",
+    };
+  }
+
+  const parcelle = await Parcelle.findByPk(args.parcelle_id);
+  if (!parcelle) {
+    return { succes: false, message: "Parcelle non trouvee." };
+  }
+  if (parcelle.utilisateurId !== user.id) {
+    return {
+      succes: false,
+      message: "Cette parcelle n'appartient pas a l'utilisateur connecte.",
+    };
+  }
+
+  const produit = await Produit.findByPk(args.produit_id);
+  if (!produit) {
+    return { succes: false, message: "Produit non trouve." };
+  }
+
+  const dateRecolte = args.date_recolte ? new Date(args.date_recolte) : new Date();
+
+  const recolte = await Recolte.create({
+    quantiteKg: args.quantite,
+    dateRecolte,
+    statut: 'en_attente',
+    parcelleId: args.parcelle_id,
+    produitId: args.produit_id,
+    utilisateurId: user.id,
+  });
+
+  return {
+    succes: true,
+    recolte: {
+      id: recolte.id,
+      produit: produit.nom,
+      quantiteKg: recolte.quantiteKg,
+      statut: recolte.statut,
+      dateRecolte: recolte.dateRecolte,
+    },
+  };
+}
+
+async function handle_creer_offre_vente(args, user) {
+  if (!args.confirmation) {
+    return {
+      succes: false,
+      confirmationRequise: true,
+      message: "Confirmation requise pour creer cette offre de vente.",
+    };
+  }
+
+  const recolte = await Recolte.findByPk(args.recolte_id, {
+    include: [{ model: Produit, as: 'produit' }]
+  });
+  if (!recolte) {
+    return { succes: false, message: "Recolte non trouvee." };
+  }
+  if (recolte.utilisateurId !== user.id) {
+    return {
+      succes: false,
+      message: "Cette recolte n'appartient pas a l'utilisateur connecte.",
+    };
+  }
+
+  let finalMarcheId = args.marche_id;
+
+  if (!finalMarcheId) {
+    // Automatic selection of the best market based on recent price record
+    const bestPrice = await PrixMarche.findOne({
+      where: { produitId: recolte.produitId || null },
+      order: [['prix', 'DESC']],
+    });
+
+    if (bestPrice && bestPrice.marcheId) {
+      finalMarcheId = bestPrice.marcheId;
+    } else {
+      // Fallback to any market if none has prices recorded
+      const anyMarche = await Marche.findOne();
+      if (!anyMarche) {
+        return { succes: false, message: "Aucun marche disponible dans le systeme pour publier l'offre." };
+      }
+      finalMarcheId = anyMarche.id;
+    }
+  }
+
+  const marche = await Marche.findByPk(finalMarcheId);
+  if (!marche) {
+    return { succes: false, message: "Marche non trouve." };
+  }
+
+  const offre = await OffreVente.create({
+    quantite: args.quantite,
+    prixDemande: args.prix_demande,
+    statut: 'ouverte',
+    recolteId: args.recolte_id,
+    marcheId: finalMarcheId,
+  });
+
+  // Transition harvest status if it is still pending
+  if (recolte.statut === 'en_attente') {
+    await recolte.update({ statut: 'disponible' });
+  }
+
+  return {
+    succes: true,
+    offre: {
+      id: offre.id,
+      quantite: offre.quantite,
+      prixDemande: offre.prixDemande,
+      marche: marche.nom,
+      produit: recolte.produit ? recolte.produit.nom : 'Inconnu',
+    },
   };
 }
 
@@ -352,12 +397,11 @@ async function handle_obtenir_prix_marche(args) {
 // ──────────────────────────────────────────────────────────────
 
 const TOOL_HANDLERS = {
-  obtenir_mes_recoltes: handle_obtenir_mes_recoltes,
-  creer_recolte: handle_creer_recolte,
-  obtenir_meilleur_prix: handle_obtenir_meilleur_prix,
-  publier_offre_vente: handle_publier_offre_vente,
-  obtenir_mes_parcelles: handle_obtenir_mes_parcelles,
-  obtenir_prix_marche: handle_obtenir_prix_marche,
+  consulter_recoltes: handle_consulter_recoltes,
+  consulter_parcelles: handle_consulter_parcelles,
+  rechercher_prix_marches: handle_rechercher_prix_marches,
+  enregistrer_recolte: handle_enregistrer_recolte,
+  creer_offre_vente: handle_creer_offre_vente,
 };
 
 /**
@@ -382,3 +426,4 @@ async function executeTool(toolName, args, user) {
 }
 
 module.exports = { TOOL_DEFINITIONS, executeTool };
+
