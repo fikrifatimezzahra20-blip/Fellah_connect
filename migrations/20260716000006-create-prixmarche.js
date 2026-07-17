@@ -17,7 +17,7 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false
       },
-      marketId: {
+      marcheId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -27,7 +27,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      productId: {
+      produitId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -47,11 +47,11 @@ module.exports = {
       }
     });
 
-    await queryInterface.addIndex('PrixMarche', ['marketId'], {
-      name: 'idx_prixmarche_market_id'
+    await queryInterface.addIndex('PrixMarche', ['marcheId'], {
+      name: 'idx_prixmarche_marche_id'
     });
-    await queryInterface.addIndex('PrixMarche', ['productId'], {
-      name: 'idx_prixmarche_product_id'
+    await queryInterface.addIndex('PrixMarche', ['produitId'], {
+      name: 'idx_prixmarche_produit_id'
     });
     await queryInterface.addIndex('PrixMarche', ['priceDate'], {
       name: 'idx_prixmarche_price_date'

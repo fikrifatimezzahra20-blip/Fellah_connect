@@ -34,8 +34,8 @@ module.exports = {
           prices.push({
             pricePerKg: finalPrice,
             priceDate: priceDate,
-            marketId: market.id,
-            productId: product.id,
+            marcheId: market.id,
+            produitId: product.id,
             createdAt: now,
             updatedAt: now
           });
