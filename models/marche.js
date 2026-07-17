@@ -25,8 +25,8 @@ module.exports = (sequelize) => {
   });
 
   Market.associate = (models) => {
-    Market.hasMany(models.MarketPrice, { foreignKey: 'marketId' });
-    Market.hasMany(models.SaleOffer, { foreignKey: 'marketId' });
+    Market.hasMany(models.MarketPrice, { foreignKey: 'marcheId' });
+    Market.hasMany(models.SaleOffer, { foreignKey: 'marcheId' });
   };
 
   return Market;

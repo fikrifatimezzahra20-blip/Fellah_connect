@@ -19,11 +19,11 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('OPEN', 'ACCEPTED', 'CLOSED'),
       allowNull: false
     },
-    harvestId: {
+    recolteId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    marketId: {
+    marcheId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
@@ -33,8 +33,8 @@ module.exports = (sequelize) => {
   });
 
   SaleOffer.associate = (models) => {
-    SaleOffer.belongsTo(models.Recolte, { foreignKey: 'harvestId' });
-    SaleOffer.belongsTo(models.Market, { foreignKey: 'marketId' });
+    SaleOffer.belongsTo(models.Recolte, { foreignKey: 'recolteId' });
+    SaleOffer.belongsTo(models.Market, { foreignKey: 'marcheId' });
   };
 
   return SaleOffer;

@@ -15,11 +15,11 @@ module.exports = (sequelize) => {
       type: DataTypes.DATE,
       allowNull: false
     },
-    marketId: {
+    marcheId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    productId: {
+    produitId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
@@ -29,8 +29,8 @@ module.exports = (sequelize) => {
   });
 
   MarketPrice.associate = (models) => {
-    MarketPrice.belongsTo(models.Market, { foreignKey: 'marketId' });
-    MarketPrice.belongsTo(models.Product, { foreignKey: 'productId' });
+    MarketPrice.belongsTo(models.Market, { foreignKey: 'marcheId' });
+    MarketPrice.belongsTo(models.Product, { foreignKey: 'produitId' });
   };
 
   return MarketPrice;

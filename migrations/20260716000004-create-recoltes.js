@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.ENUM('READY', 'SOLD'),
         allowNull: false
       },
-      parcelId: {
+      parcelleId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -31,7 +31,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      productId: {
+      produitId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -51,11 +51,11 @@ module.exports = {
       }
     });
 
-    await queryInterface.addIndex('Recoltes', ['parcelId'], {
-      name: 'idx_recoltes_parcel_id'
+    await queryInterface.addIndex('Recoltes', ['parcelleId'], {
+      name: 'idx_recoltes_parcelle_id'
     });
-    await queryInterface.addIndex('Recoltes', ['productId'], {
-      name: 'idx_recoltes_product_id'
+    await queryInterface.addIndex('Recoltes', ['produitId'], {
+      name: 'idx_recoltes_produit_id'
     });
     await queryInterface.addIndex('Recoltes', ['harvestDate'], {
       name: 'idx_recoltes_harvest_date'

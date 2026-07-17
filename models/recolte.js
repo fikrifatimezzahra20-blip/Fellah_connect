@@ -19,11 +19,11 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('READY', 'SOLD'),
       allowNull: false
     },
-    parcelId: {
+    parcelleId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    productId: {
+    produitId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
@@ -33,9 +33,9 @@ module.exports = (sequelize) => {
   });
 
   Recolte.associate = (models) => {
-    Recolte.belongsTo(models.Parcelle, { foreignKey: 'parcelId' });
-    Recolte.belongsTo(models.Product, { foreignKey: 'productId' });
-    Recolte.hasMany(models.SaleOffer, { foreignKey: 'harvestId' });
+    Recolte.belongsTo(models.Parcelle, { foreignKey: 'parcelleId' });
+    Recolte.belongsTo(models.Product, { foreignKey: 'produitId' });
+    Recolte.hasMany(models.SaleOffer, { foreignKey: 'recolteId' });
   };
 
   return Recolte;

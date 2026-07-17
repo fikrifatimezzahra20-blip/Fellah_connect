@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.ENUM('OPEN', 'ACCEPTED', 'CLOSED'),
         allowNull: false
       },
-      harvestId: {
+      recolteId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -31,7 +31,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      marketId: {
+      marcheId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -51,11 +51,11 @@ module.exports = {
       }
     });
 
-    await queryInterface.addIndex('OffresVente', ['harvestId'], {
-      name: 'idx_offresvente_harvest_id'
+    await queryInterface.addIndex('OffresVente', ['recolteId'], {
+      name: 'idx_offresvente_recolte_id'
     });
-    await queryInterface.addIndex('OffresVente', ['marketId'], {
-      name: 'idx_offresvente_market_id'
+    await queryInterface.addIndex('OffresVente', ['marcheId'], {
+      name: 'idx_offresvente_marche_id'
     });
     await queryInterface.addIndex('OffresVente', ['createdAt'], {
       name: 'idx_offresvente_created_at'

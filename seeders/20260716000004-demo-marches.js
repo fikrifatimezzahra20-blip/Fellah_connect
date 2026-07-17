@@ -6,7 +6,9 @@ module.exports = {
     await queryInterface.bulkInsert('Marches', [
       { name: 'Souk Inezgane', city: 'Inezgane', region: 'Souss-Massa', createdAt: now, updatedAt: now },
       { name: 'Marché de Gros Kenitra', city: 'Kenitra', region: 'Gharb', createdAt: now, updatedAt: now },
-      { name: 'Souk Settat', city: 'Settat', region: 'Chaouia', createdAt: now, updatedAt: now }
+      { name: 'Souk Settat', city: 'Settat', region: 'Chaouia', createdAt: now, updatedAt: now },
+      { name: 'Marché de Gros Marrakech', city: 'Marrakech', region: 'Haouz', createdAt: now, updatedAt: now },
+      { name: 'Souk Béni Mellal', city: 'Béni Mellal', region: 'Béni Mellal-Khénifra', createdAt: now, updatedAt: now }
     ], {});
   },
 
