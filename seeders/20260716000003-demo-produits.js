@@ -1,18 +1,18 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     const now = new Date();
-    await queryInterface.bulkInsert('Produits', [
-      { name: 'Tomatoes', category: 'Vegetable', unit: 'kg', createdAt: now, updatedAt: now },
-      { name: 'Potatoes', category: 'Vegetable', unit: 'kg', createdAt: now, updatedAt: now },
-      { name: 'Olives', category: 'Fruit', unit: 'kg', createdAt: now, updatedAt: now },
-      { name: 'Oranges', category: 'Fruit', unit: 'kg', createdAt: now, updatedAt: now },
-      { name: 'Mint', category: 'Herb', unit: 'bundle', createdAt: now, updatedAt: now }
+    await queryInterface.bulkInsert('produits', [
+      { nom: 'Tomates', categorie: 'Légume', unite: 'kg', createdAt: now, updatedAt: now },
+      { nom: 'Pommes de terre', categorie: 'Légume', unite: 'kg', createdAt: now, updatedAt: now },
+      { nom: 'Olives', categorie: 'Fruit', unite: 'kg', createdAt: now, updatedAt: now },
+      { nom: 'Oranges', categorie: 'Fruit', unite: 'kg', createdAt: now, updatedAt: now },
+      { nom: 'Menthe', categorie: 'Herbe', unite: 'botte', createdAt: now, updatedAt: now }
     ], {});
   },
 
-  async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Produits', null, {});
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('produits', null, {});
   }
 };

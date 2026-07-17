@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       Recolte.belongsTo(models.Produit, {
         foreignKey: 'produitId',
-        as: 'produit',
+        as: 'produitRef',
       });
       Recolte.hasMany(models.OffreVente, {
         foreignKey: 'recolteId',
@@ -35,6 +35,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.FLOAT,
         allowNull: false,
         validate: { min: 0 },
+      },
+      produit: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'Inconnu',
       },
       dateRecolte: {
         type: DataTypes.DATE,

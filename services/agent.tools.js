@@ -149,7 +149,7 @@ async function handle_consulter_recoltes(args, user) {
   const recoltes = await Recolte.findAll({
     where: { utilisateurId: targetUserId },
     include: [
-      { model: Produit, as: 'produit', attributes: ['nom', 'categorie', 'unite'] },
+      { model: Produit, as: 'produitRef', attributes: ['nom', 'categorie', 'unite'] },
       { model: Parcelle, as: 'parcelle', attributes: ['nom', 'commune'] }
     ],
     order: [['createdAt', 'DESC']],
@@ -165,7 +165,7 @@ async function handle_consulter_recoltes(args, user) {
     total: recoltes.length,
     recoltes: recoltes.map((r) => ({
       id: r.id,
-      produit: r.produit ? r.produit.nom : 'Inconnu',
+      produit: r.produitRef ? r.produitRef.nom : r.produit,
       quantiteKg: r.quantiteKg,
       statut: r.statut,
       dateRecolte: r.dateRecolte,
@@ -329,7 +329,7 @@ async function handle_creer_offre_vente(args, user) {
   }
 
   const recolte = await Recolte.findByPk(args.recolte_id, {
-    include: [{ model: Produit, as: 'produit' }]
+    include: [{ model: Produit, as: 'produitRef' }]
   });
   if (!recolte) {
     return { succes: false, message: "Recolte non trouvee." };
@@ -387,7 +387,7 @@ async function handle_creer_offre_vente(args, user) {
       quantite: offre.quantite,
       prixDemande: offre.prixDemande,
       marche: marche.nom,
-      produit: recolte.produit ? recolte.produit.nom : 'Inconnu',
+      produit: recolte.produitRef ? recolte.produitRef.nom : recolte.produit,
     },
   };
 }
