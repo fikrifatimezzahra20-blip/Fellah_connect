@@ -1,22 +1,23 @@
 'use strict';
-
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class OffreVente extends Model {
+  class Offre extends Model {
     static associate(models) {
-      OffreVente.belongsTo(models.Recolte, {
+      Offre.belongsTo(models.Recolte, {
         foreignKey: 'recolteId',
         as: 'recolte',
+        onDelete: 'CASCADE'
       });
-      OffreVente.belongsTo(models.Marche, {
+      Offre.belongsTo(models.Marche, {
         foreignKey: 'marcheId',
         as: 'marche',
+        onDelete: 'CASCADE'
       });
     }
   }
 
-  OffreVente.init(
+  Offre.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -26,12 +27,12 @@ module.exports = (sequelize, DataTypes) => {
       quantite: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        validate: { min: 0 },
+        validate: { min: 0.1 },
       },
       prixDemande: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        validate: { min: 0 },
+        validate: { min: 0.1 },
       },
       statut: {
         type: DataTypes.ENUM('ouverte', 'acceptee', 'fermee'),
@@ -49,11 +50,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'OffreVente',
-      tableName: 'offres_vente',
+      modelName: 'Offre',
+      tableName: 'offres',
       timestamps: true,
     }
   );
 
-  return OffreVente;
+  return Offre;
 };

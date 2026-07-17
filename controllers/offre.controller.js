@@ -1,6 +1,6 @@
 'use strict';
 
-const { OffreVente, Recolte, Marche } = require('../models');
+const { Offre, Recolte, Marche } = require('../models');
 
 async function create(req, res, next) {
   try {
@@ -12,22 +12,20 @@ async function create(req, res, next) {
       });
     }
 
-    // Verify ownership of the recolte
     const recolte = await Recolte.findByPk(recolteId);
     if (!recolte) {
       return res.status(404).json({ message: 'Recolte non trouvee.' });
     }
-    if (recolte.utilisateurId !== req.user.id) {
+    if (recolte.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Cette recolte ne vous appartient pas.' });
     }
 
-    // Verify market exists
     const marche = await Marche.findByPk(marcheId);
     if (!marche) {
       return res.status(404).json({ message: 'Marche non trouve.' });
     }
 
-    const offre = await OffreVente.create({
+    const offre = await Offre.create({
       quantite,
       prixDemande,
       statut: 'ouverte',
@@ -35,7 +33,6 @@ async function create(req, res, next) {
       marcheId,
     });
 
-    // Update recolte status to disponible
     if (recolte.statut === 'en_attente') {
       await recolte.update({ statut: 'disponible' });
     }
@@ -53,13 +50,13 @@ async function findAll(req, res, next) {
       where.statut = req.query.statut;
     }
 
-    const offres = await OffreVente.findAll({
+    const offres = await Offre.findAll({
       where,
       include: [
         {
           model: Recolte,
           as: 'recolte',
-          where: { utilisateurId: req.user.id },
+          where: { agriculteurId: req.user.agriculteurId },
           required: true,
         },
         { model: Marche, as: 'marche', required: false },
@@ -75,7 +72,7 @@ async function findAll(req, res, next) {
 
 async function findOne(req, res, next) {
   try {
-    const offre = await OffreVente.findByPk(req.params.id, {
+    const offre = await Offre.findByPk(req.params.id, {
       include: [
         { model: Recolte, as: 'recolte' },
         { model: Marche, as: 'marche' },
@@ -85,7 +82,7 @@ async function findOne(req, res, next) {
     if (!offre) {
       return res.status(404).json({ message: 'Offre non trouvee.' });
     }
-    if (offre.recolte.utilisateurId !== req.user.id) {
+    if (offre.recolte.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 
@@ -97,14 +94,14 @@ async function findOne(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const offre = await OffreVente.findByPk(req.params.id, {
+    const offre = await Offre.findByPk(req.params.id, {
       include: [{ model: Recolte, as: 'recolte' }],
     });
 
     if (!offre) {
       return res.status(404).json({ message: 'Offre non trouvee.' });
     }
-    if (offre.recolte.utilisateurId !== req.user.id) {
+    if (offre.recolte.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 
@@ -116,7 +113,6 @@ async function update(req, res, next) {
       ...(statut !== undefined && { statut }),
     });
 
-    // If offer is accepted, mark harvest as sold
     if (statut === 'acceptee') {
       await offre.recolte.update({ statut: 'vendue' });
     }
@@ -129,14 +125,14 @@ async function update(req, res, next) {
 
 async function destroy(req, res, next) {
   try {
-    const offre = await OffreVente.findByPk(req.params.id, {
+    const offre = await Offre.findByPk(req.params.id, {
       include: [{ model: Recolte, as: 'recolte' }],
     });
 
     if (!offre) {
       return res.status(404).json({ message: 'Offre non trouvee.' });
     }
-    if (offre.recolte.utilisateurId !== req.user.id) {
+    if (offre.recolte.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 

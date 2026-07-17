@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('parcelles', {
+    await queryInterface.createTable('marches', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -12,21 +12,15 @@ module.exports = {
       nom: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
-      superficie: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      commune: {
+      ville: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      utilisateurId: {
-        type: Sequelize.INTEGER,
+      region: {
+        type: Sequelize.STRING,
         allowNull: false,
-        references: { model: 'utilisateurs', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -38,12 +32,13 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('parcelles', ['utilisateurId'], {
-      name: 'idx_parcelles_utilisateur',
+    await queryInterface.addIndex('marches', ['nom'], {
+      unique: true,
+      name: 'idx_marches_nom',
     });
   },
 
-  async down(queryInterface) {
-    await queryInterface.dropTable('parcelles');
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('marches');
   },
 };

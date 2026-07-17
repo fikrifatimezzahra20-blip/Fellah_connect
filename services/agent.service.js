@@ -1,7 +1,7 @@
 'use strict';
 
 const { sendChatCompletion } = require('./deepseek.service');
-const { TOOL_DEFINITIONS, executeTool } = require('./agent.tools');
+const { TOOL_DEFINITIONS, executeTool } = require('../tools/agent.tools');
 
 const MAX_ITERATIONS = 5;
 
@@ -20,7 +20,6 @@ async function runAgentLoop(messages, user) {
   const toolsUsed = [];
   let iterations = 0;
 
-  // Work with a copy so we don't mutate the caller's array
   const conversationMessages = [...messages];
 
   while (iterations < MAX_ITERATIONS) {
@@ -31,7 +30,6 @@ async function runAgentLoop(messages, user) {
       TOOL_DEFINITIONS
     );
 
-    // If no tool calls, we have a final text reply
     if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
       return {
         reply: assistantMessage.content || 'Je n\'ai pas pu generer de reponse.',
@@ -40,10 +38,8 @@ async function runAgentLoop(messages, user) {
       };
     }
 
-    // Append the assistant message with tool_calls to conversation
     conversationMessages.push(assistantMessage);
 
-    // Execute each tool call and append results
     for (const toolCall of assistantMessage.tool_calls) {
       const toolName = toolCall.function.name;
       let args = {};
@@ -58,7 +54,6 @@ async function runAgentLoop(messages, user) {
 
       const result = await executeTool(toolName, args, user);
 
-      // Append the tool result as a tool message
       conversationMessages.push({
         role: 'tool',
         tool_call_id: toolCall.id,
@@ -67,7 +62,6 @@ async function runAgentLoop(messages, user) {
     }
   }
 
-  // If we hit max iterations, make one final call without tools to get a summary
   const finalMessage = await sendChatCompletion(conversationMessages);
 
   return {

@@ -14,7 +14,7 @@ async function create(req, res, next) {
       nom,
       superficie,
       commune,
-      utilisateurId: req.user.id,
+      agriculteurId: req.user.agriculteurId,
     });
 
     return res.status(201).json({ parcelle });
@@ -26,7 +26,7 @@ async function create(req, res, next) {
 async function findAll(req, res, next) {
   try {
     const parcelles = await Parcelle.findAll({
-      where: { utilisateurId: req.user.id },
+      where: { agriculteurId: req.user.agriculteurId },
       order: [['createdAt', 'DESC']],
     });
 
@@ -43,7 +43,7 @@ async function findOne(req, res, next) {
     if (!parcelle) {
       return res.status(404).json({ message: 'Parcelle non trouvee.' });
     }
-    if (parcelle.utilisateurId !== req.user.id) {
+    if (parcelle.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 
@@ -60,7 +60,7 @@ async function update(req, res, next) {
     if (!parcelle) {
       return res.status(404).json({ message: 'Parcelle non trouvee.' });
     }
-    if (parcelle.utilisateurId !== req.user.id) {
+    if (parcelle.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 
@@ -85,7 +85,7 @@ async function destroy(req, res, next) {
     if (!parcelle) {
       return res.status(404).json({ message: 'Parcelle non trouvee.' });
     }
-    if (parcelle.utilisateurId !== req.user.id) {
+    if (parcelle.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 

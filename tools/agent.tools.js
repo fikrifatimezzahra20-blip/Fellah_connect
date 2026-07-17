@@ -1,6 +1,6 @@
 'use strict';
 
-const { Recolte, Parcelle, PrixMarche, OffreVente, Marche, Produit } = require('../models');
+const { Recolte, Parcelle, PrixMarche, Offre, Marche, Produit, Agriculteur } = require('../models');
 const { Op } = require('sequelize');
 
 // ──────────────────────────────────────────────────────────────
@@ -138,7 +138,6 @@ const TOOL_DEFINITIONS = [
 async function handle_consulter_recoltes(args, user) {
   const targetUserId = args.user_id || user.id;
 
-  // Security validation: non-admin users can only view their own harvests
   if (user.role !== 'admin' && targetUserId !== user.id) {
     return {
       succes: false,
@@ -146,8 +145,14 @@ async function handle_consulter_recoltes(args, user) {
     };
   }
 
+  let queryAgriculteurId = user.agriculteurId;
+  if (user.role === 'admin' && args.user_id) {
+    const ag = await Agriculteur.findOne({ where: { userId: args.user_id } });
+    queryAgriculteurId = ag ? ag.id : args.user_id;
+  }
+
   const recoltes = await Recolte.findAll({
-    where: { utilisateurId: targetUserId },
+    where: { agriculteurId: queryAgriculteurId },
     include: [
       { model: Produit, as: 'produitRef', attributes: ['nom', 'categorie', 'unite'] },
       { model: Parcelle, as: 'parcelle', attributes: ['nom', 'commune'] }
@@ -178,7 +183,6 @@ async function handle_consulter_recoltes(args, user) {
 async function handle_consulter_parcelles(args, user) {
   const targetUserId = args.user_id || user.id;
 
-  // Security validation: non-admin users can only view their own parcelles
   if (user.role !== 'admin' && targetUserId !== user.id) {
     return {
       succes: false,
@@ -186,8 +190,14 @@ async function handle_consulter_parcelles(args, user) {
     };
   }
 
+  let queryAgriculteurId = user.agriculteurId;
+  if (user.role === 'admin' && args.user_id) {
+    const ag = await Agriculteur.findOne({ where: { userId: args.user_id } });
+    queryAgriculteurId = ag ? ag.id : args.user_id;
+  }
+
   const parcelles = await Parcelle.findAll({
-    where: { utilisateurId: targetUserId },
+    where: { agriculteurId: queryAgriculteurId },
     order: [['createdAt', 'DESC']],
   });
 
@@ -218,13 +228,11 @@ async function handle_rechercher_prix_marches(args) {
     return { trouve: false, message: "Vous devez specifier un nom ou un ID de produit." };
   }
 
-  // Find the product
   const product = await Produit.findOne({ where: productCondition });
   if (!product) {
     return { trouve: false, message: `Aucun produit trouve pour ${args.produit_id ? 'l\'ID ' + args.produit_id : '"' + args.produit + '"'}.` };
   }
 
-  // Query price records for this product
   const prices = await PrixMarche.findAll({
     where: { produitId: product.id },
     include: [{ model: Marche, as: 'marcheRef', attributes: ['nom', 'ville'] }],
@@ -233,7 +241,6 @@ async function handle_rechercher_prix_marches(args) {
   });
 
   if (prices.length === 0) {
-    // Fallback to legacy string field query on PrixMarche if no matching produitId is linked yet
     const legacyPrices = await PrixMarche.findAll({
       where: { produit: { [Op.iLike]: `%${product.nom}%` } },
       order: [['dateReleve', 'DESC']],
@@ -284,7 +291,7 @@ async function handle_enregistrer_recolte(args, user) {
   if (!parcelle) {
     return { succes: false, message: "Parcelle non trouvee." };
   }
-  if (parcelle.utilisateurId !== user.id) {
+  if (parcelle.agriculteurId !== user.agriculteurId) {
     return {
       succes: false,
       message: "Cette parcelle n'appartient pas a l'utilisateur connecte.",
@@ -304,7 +311,7 @@ async function handle_enregistrer_recolte(args, user) {
     statut: 'en_attente',
     parcelleId: args.parcelle_id,
     produitId: args.produit_id,
-    utilisateurId: user.id,
+    agriculteurId: user.agriculteurId,
   });
 
   return {
@@ -334,7 +341,7 @@ async function handle_creer_offre_vente(args, user) {
   if (!recolte) {
     return { succes: false, message: "Recolte non trouvee." };
   }
-  if (recolte.utilisateurId !== user.id) {
+  if (recolte.agriculteurId !== user.agriculteurId) {
     return {
       succes: false,
       message: "Cette recolte n'appartient pas a l'utilisateur connecte.",
@@ -344,7 +351,6 @@ async function handle_creer_offre_vente(args, user) {
   let finalMarcheId = args.marche_id;
 
   if (!finalMarcheId) {
-    // Automatic selection of the best market based on recent price record
     const bestPrice = await PrixMarche.findOne({
       where: { produitId: recolte.produitId || null },
       order: [['prix', 'DESC']],
@@ -353,7 +359,6 @@ async function handle_creer_offre_vente(args, user) {
     if (bestPrice && bestPrice.marcheId) {
       finalMarcheId = bestPrice.marcheId;
     } else {
-      // Fallback to any market if none has prices recorded
       const anyMarche = await Marche.findOne();
       if (!anyMarche) {
         return { succes: false, message: "Aucun marche disponible dans le systeme pour publier l'offre." };
@@ -367,7 +372,7 @@ async function handle_creer_offre_vente(args, user) {
     return { succes: false, message: "Marche non trouve." };
   }
 
-  const offre = await OffreVente.create({
+  const offre = await Offre.create({
     quantite: args.quantite,
     prixDemande: args.prix_demande,
     statut: 'ouverte',
@@ -375,7 +380,6 @@ async function handle_creer_offre_vente(args, user) {
     marcheId: finalMarcheId,
   });
 
-  // Transition harvest status if it is still pending
   if (recolte.statut === 'en_attente') {
     await recolte.update({ statut: 'disponible' });
   }
@@ -404,13 +408,6 @@ const TOOL_HANDLERS = {
   creer_offre_vente: handle_creer_offre_vente,
 };
 
-/**
- * Execute a tool call by name.
- * @param {string} toolName
- * @param {object} args
- * @param {object} user - { id, role }
- * @returns {Promise<object>}
- */
 async function executeTool(toolName, args, user) {
   const handler = TOOL_HANDLERS[toolName];
   if (!handler) {
@@ -426,4 +423,3 @@ async function executeTool(toolName, args, user) {
 }
 
 module.exports = { TOOL_DEFINITIONS, executeTool };
-

@@ -1,13 +1,13 @@
 'use strict';
-
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Parcelle extends Model {
     static associate(models) {
-      Parcelle.belongsTo(models.Utilisateur, {
-        foreignKey: 'utilisateurId',
+      Parcelle.belongsTo(models.Agriculteur, {
+        foreignKey: 'agriculteurId',
         as: 'proprietaire',
+        onDelete: 'CASCADE'
       });
       Parcelle.hasMany(models.Recolte, {
         foreignKey: 'parcelleId',
@@ -30,13 +30,12 @@ module.exports = (sequelize, DataTypes) => {
       superficie: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        validate: { min: 0 },
       },
       commune: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      utilisateurId: {
+      agriculteurId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

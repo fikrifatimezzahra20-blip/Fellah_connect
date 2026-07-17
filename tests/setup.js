@@ -42,8 +42,8 @@ async function createAdminUser() {
   const { user, token } = await createTestUser();
 
   // Directly update the role in DB (bypass API since register always sets 'agriculteur')
-  const { Utilisateur } = require('../models');
-  await Utilisateur.update({ role: 'admin' }, { where: { id: user.id } });
+  const { User } = require('../models');
+  await User.update({ role: 'admin' }, { where: { id: user.id } });
 
   // Re-login to get token with admin role
   const jwt = require('jsonwebtoken');

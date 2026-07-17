@@ -1,14 +1,13 @@
-
 require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const logger = require('./utils/logger');
 const { requestId } = require('./middlewares/requestId.middleware');
+const loggerMiddleware = require('./middlewares/logger.middleware');
 
 const authRoutes = require('./routes/auth.routes');
 const agentRoutes = require('./routes/agent.routes');
@@ -17,8 +16,8 @@ const parcelleRoutes = require('./routes/parcelle.routes');
 const produitRoutes = require('./routes/produit.routes');
 const marcheRoutes = require('./routes/marche.routes');
 const prixMarcheRoutes = require('./routes/prix-marche.routes');
-const offreVenteRoutes = require('./routes/offre-vente.routes');
-const userRoutes = require('./routes/user.routes');
+const offreRoutes = require('./routes/offre.routes');
+const agriculteurRoutes = require('./routes/agriculteur.routes');
 const { notFoundHandler, errorHandler } = require('./middlewares/error.middleware');
 
 const app = express();
@@ -39,12 +38,7 @@ app.use('/api/', limiter);
 app.use(cors());
 app.use(express.json());
 app.use(requestId);
-
-// Morgan → pipe through Winston
-const morganStream = {
-  write: (msg) => logger.http(msg.trim()),
-};
-app.use(morgan('short', { stream: morganStream }));
+app.use(loggerMiddleware);
 
 // ── Routes ─────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
@@ -54,8 +48,9 @@ app.use('/api/parcelles', parcelleRoutes);
 app.use('/api/produits', produitRoutes);
 app.use('/api/marches', marcheRoutes);
 app.use('/api/prix-marches', prixMarcheRoutes);
-app.use('/api/offres-vente', offreVenteRoutes);
-app.use('/api/agriculteurs', userRoutes);
+app.use('/api/offres-vente', offreRoutes); // Backwards compatibility for tests
+app.use('/api/offres', offreRoutes);       // New standardized endpoint
+app.use('/api/agriculteurs', agriculteurRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'fellahconnect-api' });

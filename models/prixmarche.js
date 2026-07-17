@@ -1,5 +1,4 @@
 'use strict';
-
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
@@ -8,10 +7,12 @@ module.exports = (sequelize, DataTypes) => {
       PrixMarche.belongsTo(models.Produit, {
         foreignKey: 'produitId',
         as: 'produitRef',
+        onDelete: 'SET NULL'
       });
       PrixMarche.belongsTo(models.Marche, {
         foreignKey: 'marcheId',
         as: 'marcheRef',
+        onDelete: 'SET NULL'
       });
     }
   }
@@ -34,15 +35,14 @@ module.exports = (sequelize, DataTypes) => {
       prix: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        validate: { min: 0 },
+        validate: { min: 0.1 },
       },
       unite: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'DH/kg',
       },
       dateReleve: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATE,
         allowNull: false,
       },
       produitId: {

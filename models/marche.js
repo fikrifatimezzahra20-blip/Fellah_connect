@@ -1,22 +1,21 @@
 'use strict';
-
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class Produit extends Model {
+  class Marche extends Model {
     static associate(models) {
-      Produit.hasMany(models.Recolte, {
-        foreignKey: 'produitId',
-        as: 'recoltes',
+      Marche.hasMany(models.Offre, {
+        foreignKey: 'marcheId',
+        as: 'offres',
       });
-      Produit.hasMany(models.PrixMarche, {
-        foreignKey: 'produitId',
+      Marche.hasMany(models.PrixMarche, {
+        foreignKey: 'marcheId',
         as: 'prix',
       });
     }
   }
 
-  Produit.init(
+  Marche.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -28,23 +27,22 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
-      categorie: {
+      ville: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      unite: {
+      region: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'kg',
       },
     },
     {
       sequelize,
-      modelName: 'Produit',
-      tableName: 'produits',
+      modelName: 'Marche',
+      tableName: 'marches',
       timestamps: true,
     }
   );
 
-  return Produit;
+  return Marche;
 };

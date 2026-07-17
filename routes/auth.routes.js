@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 
 const { register, login, me } = require('../controllers/auth.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
+const { verifyToken } = require('../middlewares/authenticate.middleware');
 const { validate } = require('../middlewares/validate.middleware');
 const { registerSchema, loginSchema } = require('../validators/auth.validator');
 
