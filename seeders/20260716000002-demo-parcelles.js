@@ -1,34 +1,34 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     const users = await queryInterface.sequelize.query(
-      `SELECT id FROM "Users" WHERE email='hassan@fellahconnect.ma';`
+      `SELECT id FROM "utilisateurs" WHERE email='hassan@fellahconnect.ma';`
     );
-    const userId = users[0][0].id;
+    const utilisateurId = users[0][0].id;
     const now = new Date();
 
-    await queryInterface.bulkInsert('Parcelles', [
+    await queryInterface.bulkInsert('parcelles', [
       {
-        name: 'Ferme Souss',
-        area: 5.5,
-        municipality: 'Souss-Massa',
-        userId: userId,
+        nom: 'Ferme Souss',
+        superficie: 5.5,
+        commune: 'Souss-Massa',
+        utilisateurId: utilisateurId,
         createdAt: now,
         updatedAt: now
       },
       {
-        name: 'Terre Chaouia',
-        area: 12.0,
-        municipality: 'Chaouia',
-        userId: userId,
+        nom: 'Terre Chaouia',
+        superficie: 12.0,
+        commune: 'Chaouia',
+        utilisateurId: utilisateurId,
         createdAt: now,
         updatedAt: now
       }
     ], {});
   },
 
-  async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Parcelles', null, {});
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('parcelles', null, {});
   }
 };

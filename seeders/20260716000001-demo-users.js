@@ -1,37 +1,47 @@
 'use strict';
 
+const bcrypt = require('bcrypt');
+
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     const now = new Date();
-    await queryInterface.bulkInsert('Users', [
+    const hashedPassword = await bcrypt.hash('password123', 10);
+
+    await queryInterface.bulkInsert('utilisateurs', [
       {
-        fullName: 'Admin Manager',
+        nom: 'Admin Manager',
+        telephone: '0611223344',
         email: 'admin@fellahconnect.ma',
-        password: 'hashedpassword123',
-        role: 'ADMIN',
+        motDePasse: hashedPassword,
+        role: 'admin',
+        region: 'Rabat-Salé-Kénitra',
         createdAt: now,
         updatedAt: now
       },
       {
-        fullName: 'Hassan El Agriculteur',
+        nom: 'Hassan El Agriculteur',
+        telephone: '0622334455',
         email: 'hassan@fellahconnect.ma',
-        password: 'hashedpassword123',
-        role: 'FARMER',
+        motDePasse: hashedPassword,
+        role: 'agriculteur',
+        region: 'Souss-Massa',
         createdAt: now,
         updatedAt: now
       },
       {
-        fullName: 'Brahim Le Releveur',
+        nom: 'Brahim Le Releveur',
+        telephone: '0633445566',
         email: 'brahim@fellahconnect.ma',
-        password: 'hashedpassword123',
-        role: 'RELEVEUR',
+        motDePasse: hashedPassword,
+        role: 'agriculteur',
+        region: 'Chaouia',
         createdAt: now,
         updatedAt: now
       }
     ], {});
   },
 
-  async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Users', null, {});
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('utilisateurs', null, {});
   }
 };

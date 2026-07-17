@@ -1,18 +1,18 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     const now = new Date();
-    await queryInterface.bulkInsert('Marches', [
-      { name: 'Souk Inezgane', city: 'Inezgane', region: 'Souss-Massa', createdAt: now, updatedAt: now },
-      { name: 'Marché de Gros Kenitra', city: 'Kenitra', region: 'Gharb', createdAt: now, updatedAt: now },
-      { name: 'Souk Settat', city: 'Settat', region: 'Chaouia', createdAt: now, updatedAt: now },
-      { name: 'Marché de Gros Marrakech', city: 'Marrakech', region: 'Haouz', createdAt: now, updatedAt: now },
-      { name: 'Souk Béni Mellal', city: 'Béni Mellal', region: 'Béni Mellal-Khénifra', createdAt: now, updatedAt: now }
+    await queryInterface.bulkInsert('marches', [
+      { nom: 'Souk Inezgane', ville: 'Inezgane', region: 'Souss-Massa', createdAt: now, updatedAt: now },
+      { nom: 'Marché de Gros Kenitra', ville: 'Kenitra', region: 'Gharb', createdAt: now, updatedAt: now },
+      { nom: 'Souk Settat', ville: 'Settat', region: 'Chaouia', createdAt: now, updatedAt: now },
+      { nom: 'Marché de Gros Marrakech', ville: 'Marrakech', region: 'Haouz', createdAt: now, updatedAt: now },
+      { nom: 'Souk Béni Mellal', ville: 'Béni Mellal', region: 'Béni Mellal-Khénifra', createdAt: now, updatedAt: now }
     ], {});
   },
 
-  async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Marches', null, {});
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('marches', null, {});
   }
 };

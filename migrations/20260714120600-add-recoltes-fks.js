@@ -32,9 +32,38 @@ module.exports = {
     await queryInterface.addIndex('recoltes', ['produitId'], {
       name: 'idx_recoltes_produit_fk',
     });
+
+    // Add columns for prix_marches
+    await queryInterface.addColumn('prix_marches', 'produitId', {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: { model: 'produits', key: 'id' },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    });
+
+    await queryInterface.addColumn('prix_marches', 'marcheId', {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: { model: 'marches', key: 'id' },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    });
+
+    await queryInterface.addIndex('prix_marches', ['produitId'], {
+      name: 'idx_prixmarches_produit_fk',
+    });
+    await queryInterface.addIndex('prix_marches', ['marcheId'], {
+      name: 'idx_prixmarches_marche_fk',
+    });
   },
 
   async down(queryInterface) {
+    await queryInterface.removeIndex('prix_marches', 'idx_prixmarches_marche_fk');
+    await queryInterface.removeIndex('prix_marches', 'idx_prixmarches_produit_fk');
+    await queryInterface.removeColumn('prix_marches', 'marcheId');
+    await queryInterface.removeColumn('prix_marches', 'produitId');
+
     await queryInterface.removeIndex('recoltes', 'idx_recoltes_produit_fk');
     await queryInterface.removeIndex('recoltes', 'idx_recoltes_parcelle');
     await queryInterface.removeColumn('recoltes', 'dateRecolte');

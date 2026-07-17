@@ -24,7 +24,7 @@ async function create(req, res, next) {
       statut: statut || 'en_attente',
       parcelleId: parcelleId || null,
       produitId: produitId || null,
-      produit: produit || null,
+      produit: produit || 'Inconnu',
       prixSouhaite: prixSouhaite || null,
       utilisateurId: req.user.id,
     });
@@ -47,7 +47,7 @@ async function findAll(req, res, next) {
       where,
       include: [
         { model: Parcelle, as: 'parcelle', required: false },
-        { model: Produit, as: 'produit', required: false },
+        { model: Produit, as: 'produitRef', required: false },
       ],
       order: [['createdAt', 'DESC']],
     });
@@ -63,7 +63,7 @@ async function findOne(req, res, next) {
     const recolte = await Recolte.findByPk(req.params.id, {
       include: [
         { model: Parcelle, as: 'parcelle', required: false },
-        { model: Produit, as: 'produit', required: false },
+        { model: Produit, as: 'produitRef', required: false },
       ],
     });
 
