@@ -1,23 +1,25 @@
 'use strict';
-
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Recolte extends Model {
     static associate(models) {
-      Recolte.belongsTo(models.Utilisateur, {
-        foreignKey: 'utilisateurId',
+      Recolte.belongsTo(models.Agriculteur, {
+        foreignKey: 'agriculteurId',
         as: 'agriculteur',
+        onDelete: 'CASCADE'
       });
       Recolte.belongsTo(models.Parcelle, {
         foreignKey: 'parcelleId',
         as: 'parcelle',
+        onDelete: 'SET NULL'
       });
       Recolte.belongsTo(models.Produit, {
         foreignKey: 'produitId',
         as: 'produitRef',
+        onDelete: 'SET NULL'
       });
-      Recolte.hasMany(models.OffreVente, {
+      Recolte.hasMany(models.Offre, {
         foreignKey: 'recolteId',
         as: 'offres',
       });
@@ -34,12 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       quantiteKg: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        validate: { min: 0 },
-      },
-      produit: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: 'Inconnu',
+        validate: { min: 0.1 },
       },
       dateRecolte: {
         type: DataTypes.DATE,
@@ -58,13 +55,19 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
-      utilisateurId: {
-        type: DataTypes.INTEGER,
+      produit: {
+        type: DataTypes.STRING,
         allowNull: false,
+        defaultValue: 'Inconnu',
       },
       prixSouhaite: {
         type: DataTypes.FLOAT,
         allowNull: true,
+        validate: { min: 0.1 },
+      },
+      agriculteurId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
     },
     {

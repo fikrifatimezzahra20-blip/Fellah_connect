@@ -4,8 +4,8 @@ const express = require('express');
 const router = express.Router();
 
 const { create, findAll, findOne, meilleurPrix, update, destroy } = require('../controllers/prix-marche.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
-const { requireRole } = require('../middlewares/role.middleware');
+const { verifyToken } = require('../middlewares/authenticate.middleware');
+const { requireRole } = require('../middlewares/authorize.middleware');
 const { validate } = require('../middlewares/validate.middleware');
 const { createPrixMarcheSchema, updatePrixMarcheSchema } = require('../validators/prix-marche.validator');
 const { idParamSchema } = require('../validators/params.validator');

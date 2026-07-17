@@ -2,26 +2,23 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const users = await queryInterface.sequelize.query(
-      `SELECT id FROM "utilisateurs" WHERE email='hassan@fellahconnect.ma';`
-    );
-    const utilisateurId = users[0][0].id;
     const now = new Date();
-
     await queryInterface.bulkInsert('parcelles', [
       {
+        id: 1,
         nom: 'Ferme Souss',
         superficie: 5.5,
         commune: 'Souss-Massa',
-        utilisateurId: utilisateurId,
+        agriculteurId: 1, // Hassan El Agriculteur
         createdAt: now,
         updatedAt: now
       },
       {
+        id: 2,
         nom: 'Terre Chaouia',
         superficie: 12.0,
         commune: 'Chaouia',
-        utilisateurId: utilisateurId,
+        agriculteurId: 1, // Hassan El Agriculteur
         createdAt: now,
         updatedAt: now
       }

@@ -10,10 +10,9 @@ async function create(req, res, next) {
       return res.status(400).json({ message: 'quantiteKg est requis.' });
     }
 
-    // If parcelleId is provided, verify ownership
     if (parcelleId) {
       const parcelle = await Parcelle.findByPk(parcelleId);
-      if (!parcelle || parcelle.utilisateurId !== req.user.id) {
+      if (!parcelle || parcelle.agriculteurId !== req.user.agriculteurId) {
         return res.status(403).json({ message: 'Cette parcelle ne vous appartient pas.' });
       }
     }
@@ -26,7 +25,7 @@ async function create(req, res, next) {
       produitId: produitId || null,
       produit: produit || 'Inconnu',
       prixSouhaite: prixSouhaite || null,
-      utilisateurId: req.user.id,
+      agriculteurId: req.user.agriculteurId,
     });
 
     return res.status(201).json({ recolte });
@@ -37,7 +36,7 @@ async function create(req, res, next) {
 
 async function findAll(req, res, next) {
   try {
-    const where = { utilisateurId: req.user.id };
+    const where = { agriculteurId: req.user.agriculteurId };
 
     if (req.query.statut) {
       where.statut = req.query.statut;
@@ -70,7 +69,7 @@ async function findOne(req, res, next) {
     if (!recolte) {
       return res.status(404).json({ message: 'Recolte non trouvee.' });
     }
-    if (recolte.utilisateurId !== req.user.id) {
+    if (recolte.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 
@@ -87,7 +86,7 @@ async function update(req, res, next) {
     if (!recolte) {
       return res.status(404).json({ message: 'Recolte non trouvee.' });
     }
-    if (recolte.utilisateurId !== req.user.id) {
+    if (recolte.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 
@@ -115,7 +114,7 @@ async function destroy(req, res, next) {
     if (!recolte) {
       return res.status(404).json({ message: 'Recolte non trouvee.' });
     }
-    if (recolte.utilisateurId !== req.user.id) {
+    if (recolte.agriculteurId !== req.user.agriculteurId) {
       return res.status(403).json({ message: 'Acces refuse.' });
     }
 

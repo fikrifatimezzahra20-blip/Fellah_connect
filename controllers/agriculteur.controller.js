@@ -1,19 +1,23 @@
 'use strict';
 
-const { Utilisateur, Parcelle } = require('../models');
+const { User, Agriculteur, Parcelle } = require('../models');
 
 async function getFarmerParcelles(req, res, next) {
   try {
     const { id } = req.params;
 
-    // Retrieve farmer (role 'agriculteur') with nested parcelles
-    const farmer = await Utilisateur.findOne({
-      where: { id, role: 'agriculteur' },
+    const farmer = await Agriculteur.findOne({
+      where: { id },
       include: [
         {
           model: Parcelle,
           as: 'parcelles',
           attributes: ['id', 'nom', 'superficie', 'commune']
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['email']
         }
       ]
     });
@@ -26,7 +30,7 @@ async function getFarmerParcelles(req, res, next) {
       id: farmer.id,
       nom: farmer.nom,
       telephone: farmer.telephone,
-      email: farmer.email,
+      email: farmer.user ? farmer.user.email : null,
       region: farmer.region,
       parcelles: farmer.parcelles
     });

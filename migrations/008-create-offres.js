@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('offres_vente', {
+    await queryInterface.createTable('offres', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -25,14 +25,20 @@ module.exports = {
       recolteId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'recoltes', key: 'id' },
+        references: {
+          model: 'recoltes',
+          key: 'id',
+        },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
       marcheId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'marches', key: 'id' },
+        references: {
+          model: 'marches',
+          key: 'id',
+        },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
@@ -46,21 +52,23 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('offres_vente', ['recolteId'], {
-      name: 'idx_offres_recolte',
-    });
-    await queryInterface.addIndex('offres_vente', ['marcheId'], {
-      name: 'idx_offres_marche',
-    });
-    await queryInterface.addIndex('offres_vente', ['statut'], {
+    await queryInterface.addIndex('offres', ['statut'], {
       name: 'idx_offres_statut',
+    });
+
+    await queryInterface.addIndex('offres', ['recolteId'], {
+      name: 'idx_offres_recolte_id',
+    });
+
+    await queryInterface.addIndex('offres', ['marcheId'], {
+      name: 'idx_offres_marche_id',
     });
   },
 
-  async down(queryInterface) {
-    await queryInterface.dropTable('offres_vente');
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('offres');
     await queryInterface.sequelize.query(
-      'DROP TYPE IF EXISTS "enum_offres_vente_statut";'
+      'DROP TYPE IF EXISTS "enum_offres_statut";'
     );
   },
 };

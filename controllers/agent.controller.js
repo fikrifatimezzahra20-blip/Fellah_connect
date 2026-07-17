@@ -1,6 +1,6 @@
 'use strict';
 
-const { runAgentLoop } = require('../services/agent-loop.service');
+const { runAgentLoop } = require('../services/agent.service');
 const { AGENT_SYSTEM_PROMPT } = require('../prompts/agent.systemPrompt');
 const memoryService = require('../services/memory.service');
 

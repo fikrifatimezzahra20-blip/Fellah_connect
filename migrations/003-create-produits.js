@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('marches', {
+    await queryInterface.createTable('produits', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -12,12 +12,13 @@ module.exports = {
       nom: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
-      ville: {
+      categorie: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      region: {
+      unite: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -31,12 +32,13 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('marches', ['region'], {
-      name: 'idx_marches_region',
+    await queryInterface.addIndex('produits', ['nom'], {
+      unique: true,
+      name: 'idx_produits_nom',
     });
   },
 
-  async down(queryInterface) {
-    await queryInterface.dropTable('marches');
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('produits');
   },
 };

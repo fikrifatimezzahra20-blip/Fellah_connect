@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('produits', {
+    await queryInterface.createTable('agriculteurs', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -12,16 +12,26 @@ module.exports = {
       nom: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      telephone: {
+        type: Sequelize.STRING,
+        allowNull: false,
         unique: true,
       },
-      categorie: {
+      region: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
-      unite: {
-        type: Sequelize.STRING,
+      userId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 'kg',
+        unique: true,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -33,16 +43,13 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('produits', ['nom'], {
+    await queryInterface.addIndex('agriculteurs', ['telephone'], {
       unique: true,
-      name: 'idx_produits_nom',
-    });
-    await queryInterface.addIndex('produits', ['categorie'], {
-      name: 'idx_produits_categorie',
+      name: 'idx_agriculteurs_telephone',
     });
   },
 
-  async down(queryInterface) {
-    await queryInterface.dropTable('produits');
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('agriculteurs');
   },
 };

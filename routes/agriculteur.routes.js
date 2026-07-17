@@ -3,8 +3,8 @@
 const express = require('express');
 const router = express.Router();
 
-const { getFarmerParcelles } = require('../controllers/user.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
+const { getFarmerParcelles } = require('../controllers/agriculteur.controller');
+const { verifyToken } = require('../middlewares/authenticate.middleware');
 
 router.use(verifyToken);
 

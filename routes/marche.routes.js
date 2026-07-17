@@ -4,8 +4,8 @@ const express = require('express');
 const router = express.Router();
 
 const { create, findAll, findOne, update, destroy } = require('../controllers/marche.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
-const { requireRole } = require('../middlewares/role.middleware');
+const { verifyToken } = require('../middlewares/authenticate.middleware');
+const { requireRole } = require('../middlewares/authorize.middleware');
 const { validate } = require('../middlewares/validate.middleware');
 const { createMarcheSchema, updateMarcheSchema } = require('../validators/marche.validator');
 const { idParamSchema } = require('../validators/params.validator');
