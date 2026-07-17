@@ -1,13 +1,9 @@
-require("dotenv").config();
+/**
+ * src/server.js — Entry point for `npm run dev` and `npm start`.
+ * Imports the fully configured Express app from the root.
+ * The root server.js handles starting the HTTP server when NODE_ENV !== 'test'.
+ */
+require('dotenv').config();
 
-console.log("Starting server...");
-
-const app = require("./app");
-
-const PORT = process.env.PORT || 3000;
-
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
-});
-
-console.log(server.address());
+// Simply require the root server — it sets up Express and starts listening
+require('../server');

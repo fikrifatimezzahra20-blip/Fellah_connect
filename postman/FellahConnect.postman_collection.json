@@ -1,0 +1,550 @@
+{
+  "info": {
+    "name": "FellahConnect API",
+    "description": "Collection complete de l'API FellahConnect — plateforme pour les agriculteurs marocains.\n\nPour commencer:\n1. Importez l'environnement \"FellahConnect Local\"\n2. Executez \"Register\" ou \"Login\" — le token sera sauvegarde automatiquement\n3. Toutes les autres requetes utilisent le token automatiquement",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.environment.set('token', json.token);",
+                  "  pm.environment.set('userId', json.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Ahmed El Fellah\",\n  \"telephone\": \"0612345678\",\n  \"email\": \"ahmed@example.com\",\n  \"motDePasse\": \"password123\",\n  \"region\": \"Souss-Massa\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.environment.set('token', json.token);",
+                  "  pm.environment.set('userId', json.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telephone\": \"0612345678\",\n  \"motDePasse\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Me (Current User)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/auth/me", "host": ["{{base_url}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parcelles",
+      "item": [
+        {
+          "name": "Create Parcelle",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('parcelleId', pm.response.json().parcelle.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Parcelle Nord\",\n  \"superficie\": 2.5,\n  \"commune\": \"Ait Melloul\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/parcelles", "host": ["{{base_url}}"], "path": ["parcelles"] }
+          }
+        },
+        {
+          "name": "List Parcelles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/parcelles", "host": ["{{base_url}}"], "path": ["parcelles"] }
+          }
+        },
+        {
+          "name": "Get Parcelle by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/parcelles/{{parcelleId}}", "host": ["{{base_url}}"], "path": ["parcelles", "{{parcelleId}}"] }
+          }
+        },
+        {
+          "name": "Update Parcelle",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Parcelle Nord (updated)\",\n  \"superficie\": 3.0\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/parcelles/{{parcelleId}}", "host": ["{{base_url}}"], "path": ["parcelles", "{{parcelleId}}"] }
+          }
+        },
+        {
+          "name": "Delete Parcelle",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/parcelles/{{parcelleId}}", "host": ["{{base_url}}"], "path": ["parcelles", "{{parcelleId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recoltes",
+      "item": [
+        {
+          "name": "Create Recolte",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('recolteId', pm.response.json().recolte.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantiteKg\": 500,\n  \"produit\": \"Tomate\",\n  \"prixSouhaite\": 8.5,\n  \"parcelleId\": {{parcelleId}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/recoltes", "host": ["{{base_url}}"], "path": ["recoltes"] }
+          }
+        },
+        {
+          "name": "List Recoltes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/recoltes", "host": ["{{base_url}}"], "path": ["recoltes"] }
+          }
+        },
+        {
+          "name": "List Recoltes (by status)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/recoltes?statut=en_attente",
+              "host": ["{{base_url}}"],
+              "path": ["recoltes"],
+              "query": [{ "key": "statut", "value": "en_attente" }]
+            }
+          }
+        },
+        {
+          "name": "Get Recolte by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/recoltes/{{recolteId}}", "host": ["{{base_url}}"], "path": ["recoltes", "{{recolteId}}"] }
+          }
+        },
+        {
+          "name": "Update Recolte",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantiteKg\": 600,\n  \"statut\": \"disponible\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/recoltes/{{recolteId}}", "host": ["{{base_url}}"], "path": ["recoltes", "{{recolteId}}"] }
+          }
+        },
+        {
+          "name": "Delete Recolte",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/recoltes/{{recolteId}}", "host": ["{{base_url}}"], "path": ["recoltes", "{{recolteId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Produits (Admin)",
+      "item": [
+        {
+          "name": "Create Produit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('produitId', pm.response.json().produit.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Tomate\",\n  \"categorie\": \"Legume\",\n  \"unite\": \"kg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/produits", "host": ["{{base_url}}"], "path": ["produits"] }
+          }
+        },
+        {
+          "name": "List Produits",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/produits", "host": ["{{base_url}}"], "path": ["produits"] }
+          }
+        },
+        {
+          "name": "Get Produit by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/produits/{{produitId}}", "host": ["{{base_url}}"], "path": ["produits", "{{produitId}}"] }
+          }
+        },
+        {
+          "name": "Update Produit",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Tomate Cerise\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/produits/{{produitId}}", "host": ["{{base_url}}"], "path": ["produits", "{{produitId}}"] }
+          }
+        },
+        {
+          "name": "Delete Produit",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/produits/{{produitId}}", "host": ["{{base_url}}"], "path": ["produits", "{{produitId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Marches (Admin)",
+      "item": [
+        {
+          "name": "Create Marche",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('marcheId', pm.response.json().marche.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Souk El Had\",\n  \"ville\": \"Agadir\",\n  \"region\": \"Souss-Massa\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/marches", "host": ["{{base_url}}"], "path": ["marches"] }
+          }
+        },
+        {
+          "name": "List Marches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/marches", "host": ["{{base_url}}"], "path": ["marches"] }
+          }
+        },
+        {
+          "name": "Get Marche by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/marches/{{marcheId}}", "host": ["{{base_url}}"], "path": ["marches", "{{marcheId}}"] }
+          }
+        },
+        {
+          "name": "Update Marche",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Souk El Had (renove)\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/marches/{{marcheId}}", "host": ["{{base_url}}"], "path": ["marches", "{{marcheId}}"] }
+          }
+        },
+        {
+          "name": "Delete Marche",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/marches/{{marcheId}}", "host": ["{{base_url}}"], "path": ["marches", "{{marcheId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prix Marches (Admin write)",
+      "item": [
+        {
+          "name": "Create Prix Marche",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('prixMarcheId', pm.response.json().prixMarche.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"produit\": \"Tomate\",\n  \"marche\": \"Souk El Had\",\n  \"prix\": 8.5,\n  \"unite\": \"DH/kg\",\n  \"dateReleve\": \"2026-07-17\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/prix-marches", "host": ["{{base_url}}"], "path": ["prix-marches"] }
+          }
+        },
+        {
+          "name": "List Prix Marches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/prix-marches", "host": ["{{base_url}}"], "path": ["prix-marches"] }
+          }
+        },
+        {
+          "name": "Get Meilleur Prix",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/prix-marches/meilleur/tomate", "host": ["{{base_url}}"], "path": ["prix-marches", "meilleur", "tomate"] }
+          }
+        },
+        {
+          "name": "Get Prix Marche by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/prix-marches/{{prixMarcheId}}", "host": ["{{base_url}}"], "path": ["prix-marches", "{{prixMarcheId}}"] }
+          }
+        },
+        {
+          "name": "Update Prix Marche",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prix\": 9.0\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/prix-marches/{{prixMarcheId}}", "host": ["{{base_url}}"], "path": ["prix-marches", "{{prixMarcheId}}"] }
+          }
+        },
+        {
+          "name": "Delete Prix Marche",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/prix-marches/{{prixMarcheId}}", "host": ["{{base_url}}"], "path": ["prix-marches", "{{prixMarcheId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Offres de Vente",
+      "item": [
+        {
+          "name": "Create Offre de Vente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('offreId', pm.response.json().offre.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantite\": 200,\n  \"prixDemande\": 9.0,\n  \"recolteId\": {{recolteId}},\n  \"marcheId\": {{marcheId}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/offres-vente", "host": ["{{base_url}}"], "path": ["offres-vente"] }
+          }
+        },
+        {
+          "name": "List Offres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/offres-vente", "host": ["{{base_url}}"], "path": ["offres-vente"] }
+          }
+        },
+        {
+          "name": "Get Offre by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/offres-vente/{{offreId}}", "host": ["{{base_url}}"], "path": ["offres-vente", "{{offreId}}"] }
+          }
+        },
+        {
+          "name": "Update Offre (Accept)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"acceptee\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/offres-vente/{{offreId}}", "host": ["{{base_url}}"], "path": ["offres-vente", "{{offreId}}"] }
+          }
+        },
+        {
+          "name": "Delete Offre",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/offres-vente/{{offreId}}", "host": ["{{base_url}}"], "path": ["offres-vente", "{{offreId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agent IA",
+      "item": [
+        {
+          "name": "Chat with Agent",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"J'ai 300 kg de tomates, ou je peux les vendre au meilleur prix ?\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/agent/chat", "host": ["{{base_url}}"], "path": ["agent", "chat"] }
+          }
+        },
+        {
+          "name": "Reset Agent Memory",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/agent/memory", "host": ["{{base_url}}"], "path": ["agent", "memory"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] }
+          }
+        }
+      ]
+    }
+  ]
+}
