@@ -4,10 +4,10 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-
 const logger = require('./utils/logger');
 const { requestId } = require('./middlewares/requestId.middleware');
 const loggerMiddleware = require('./middlewares/logger.middleware');
+const openApiSpec = require('./docs/openapi');
 
 const authRoutes = require('./routes/auth.routes');
 const agentRoutes = require('./routes/agent.routes');
@@ -23,7 +23,13 @@ const { notFoundHandler, errorHandler } = require('./middlewares/error.middlewar
 const app = express();
 
 // ── Security ───────────────────────────────────────────────────
-app.use(helmet());
+// Skip helmet entirely for Scalar docs (needs CDN scripts + inline scripts)
+app.use((req, res, next) => {
+  if (req.originalUrl.startsWith('/api/docs')) {
+    return next();
+  }
+  return helmet()(req, res, next);
+});
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -54,6 +60,31 @@ app.use('/api/agriculteurs', agriculteurRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'fellahconnect-api' });
+});
+
+// ── API Documentation (Scalar UI) ──────────────────────────────
+app.get('/api/docs.json', (req, res) => {
+  res.status(200).json(openApiSpec);
+});
+
+// Lazy-load Scalar (ESM-only) to stay compatible with Jest / CommonJS tests
+let _scalarMiddleware;
+app.use('/api/docs', async (req, res, next) => {
+  try {
+    if (!_scalarMiddleware) {
+      const { apiReference } = await import('@scalar/express-api-reference');
+      _scalarMiddleware = apiReference({
+        spec: { content: openApiSpec },
+        theme: 'kepler',
+        layout: 'modern',
+        defaultHttpClient: { targetKey: 'javascript', clientKey: 'fetch' },
+        metaData: { title: 'FellahConnect API Docs' },
+      });
+    }
+    _scalarMiddleware(req, res, next);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // ── Error handling ─────────────────────────────────────────────

@@ -2,8 +2,9 @@
 
 const axios = require('axios');
 
-const deepseekClient = axios.create({
-  baseURL: process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com',
+// ── LLM client (Groq — free tier, OpenAI-compatible) ───────────
+const llmClient = axios.create({
+  baseURL: process.env.LLM_API_URL || 'https://api.groq.com/openai/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,8 +12,11 @@ const deepseekClient = axios.create({
 });
 
 // Set Authorization header dynamically (env may not be loaded at import time)
-deepseekClient.interceptors.request.use((config) => {
-  config.headers.Authorization = `Bearer ${process.env.DEEPSEEK_API_KEY}`;
+llmClient.interceptors.request.use((config) => {
+  const apiKey =
+    process.env.GROQ_API_KEY ||
+    process.env.DEEPSEEK_API_KEY; // fallback for backwards compat
+  config.headers.Authorization = `Bearer ${apiKey}`;
   return config;
 });
 
@@ -24,7 +28,7 @@ deepseekClient.interceptors.request.use((config) => {
 async function sendChatMessage(messages) {
   const message = await sendChatCompletion(messages);
   if (!message.content) {
-    throw new Error('Reponse DeepSeek vide ou mal formee.');
+    throw new Error('Reponse LLM vide ou mal formee.');
   }
   return message.content;
 }
@@ -38,7 +42,7 @@ async function sendChatMessage(messages) {
 async function sendChatCompletion(messages, tools = undefined) {
   try {
     const body = {
-      model: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+      model: process.env.LLM_MODEL || 'llama-3.3-70b-versatile',
       messages,
       temperature: 0.4,
     };
@@ -48,19 +52,19 @@ async function sendChatCompletion(messages, tools = undefined) {
       body.tool_choice = 'auto';
     }
 
-    const response = await deepseekClient.post('/chat/completions', body);
+    const response = await llmClient.post('/chat/completions', body);
     const message = response.data?.choices?.[0]?.message;
 
     if (!message) {
-      throw new Error('Reponse DeepSeek vide ou mal formee.');
+      throw new Error('Reponse LLM vide ou mal formee.');
     }
 
     return message;
   } catch (err) {
     if (err.response) {
-      console.error('Erreur DeepSeek:', err.response.status, err.response.data);
+      console.error('Erreur LLM:', err.response.status, err.response.data);
       throw new Error(
-        `Erreur DeepSeek (${err.response.status}): ${JSON.stringify(err.response.data)}`
+        `Erreur LLM (${err.response.status}): ${JSON.stringify(err.response.data)}`
       );
     }
     throw err;
@@ -68,3 +72,4 @@ async function sendChatCompletion(messages, tools = undefined) {
 }
 
 module.exports = { sendChatMessage, sendChatCompletion };
+
