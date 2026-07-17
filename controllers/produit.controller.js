@@ -1,6 +1,7 @@
 'use strict';
 
-const { Produit } = require('../models');
+const { Produit, PrixMarche, Marche } = require('../models');
+const { Op } = require('sequelize');
 
 async function create(req, res, next) {
   try {
@@ -87,4 +88,46 @@ async function destroy(req, res, next) {
   }
 }
 
-module.exports = { create, findAll, findOne, update, destroy };
+async function getMeilleurPrix(req, res, next) {
+  try {
+    const produitId = req.params.id;
+
+    // Verify if the product exists
+    const product = await Produit.findByPk(produitId);
+    if (!product) {
+      return res.status(404).json({ message: 'Produit non trouve.' });
+    }
+
+    const prixMarches = await PrixMarche.findAll({
+      where: {
+        [Op.or]: [
+          { produitId },
+          { produit: product.nom }
+        ]
+      },
+      include: [
+        {
+          model: Marche,
+          as: 'marcheRef',
+          attributes: ['nom', 'ville', 'region']
+        }
+      ],
+      order: [['prix', 'DESC']]
+    });
+
+    return res.status(200).json({
+      produit: product.nom,
+      prix: prixMarches.map(pm => ({
+        id: pm.id,
+        prix: pm.prix,
+        unite: pm.unite,
+        dateReleve: pm.dateReleve,
+        marche: pm.marcheRef ? pm.marcheRef.nom : pm.marche
+      }))
+    });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+module.exports = { create, findAll, findOne, update, destroy, getMeilleurPrix };

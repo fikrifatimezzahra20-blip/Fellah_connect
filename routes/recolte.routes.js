@@ -11,9 +11,10 @@ const { idParamSchema } = require('../validators/params.validator');
 
 router.use(verifyToken);
 
-router.post('/', validate(createRecolteSchema), create);
 router.get('/', findAll);
 router.get('/:id', validate(idParamSchema, 'params'), findOne);
+
+router.post('/', validate(createRecolteSchema), create);
 router.put('/:id', validate(idParamSchema, 'params'), validate(updateRecolteSchema), update);
 router.delete('/:id', validate(idParamSchema, 'params'), destroy);
 

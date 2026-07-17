@@ -12,11 +12,9 @@ const { idParamSchema } = require('../validators/params.validator');
 
 router.use(verifyToken);
 
-// Read — all authenticated users
 router.get('/', findAll);
 router.get('/:id', validate(idParamSchema, 'params'), findOne);
 
-// Write — admin only
 router.post('/', requireRole('admin'), validate(createProduitSchema), create);
 router.put('/:id', requireRole('admin'), validate(idParamSchema, 'params'), validate(updateProduitSchema), update);
 router.delete('/:id', requireRole('admin'), validate(idParamSchema, 'params'), destroy);
